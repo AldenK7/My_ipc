@@ -7,6 +7,7 @@
 #include <GLmodel/GLmodel.h>
 #include "Mesh.h"
 #include "AABB.h"
+#include "Eigen/Dense"
 
 class MeshCollection
 {
@@ -16,16 +17,19 @@ public:
 		
 	int getSize();
 	void updatePos(Eigen::MatrixXd qt);
+	void updateRot(Eigen::MatrixXd Qt);
 
 	void addMesh(Mesh* newMesh);
 
-	double getBarrier();
+	double getBarrier(Eigen::Vector3d trans, Eigen::Vector3d rot);
+
+	Eigen::MatrixXd getTranslations();
+	Eigen::MatrixXd getRotations();
 
 protected:
 	int maxSize;
 	int numMeshes;
-	
-	Mesh** meshes;
 
+	Mesh** meshes;
 };
 #endif

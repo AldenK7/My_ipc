@@ -35,7 +35,7 @@ public:
 
 	void createBVH();
 	void updateBVH();
-	double barrierWithMesh(Mesh* mesh);
+	double barrierWithMesh(Mesh* mesh, Eigen::Vector3d trans, Eigen::Vector3d rot);
 
 	void setTranslation(double* p);
 	void setRotation(double* p);
@@ -60,6 +60,9 @@ public:
 	Triangle* init_triangles;
 	int num_triangles;
 
+	Eigen::Vector3d m_pos;
+	Eigen::Vector3d m_rot;
+
 protected:
 
 	float m_sx;
@@ -67,9 +70,6 @@ protected:
 	float m_sz;
 
 	float size;
-
-	Eigen::Vector3d m_pos;
-	Eigen::Vector3d m_rot;
 
 	double dhat = 0.1;
 	

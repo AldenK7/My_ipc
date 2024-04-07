@@ -10,7 +10,7 @@
 #include "MeshCollection.h"
 #include "finitediff.h"
 #include "GlobalResourceManager.h"
-#include "Eigen/Core"
+#include "Eigen/Dense"
 
 #include <string>
 
@@ -21,7 +21,9 @@ public:
 
 	Ipc(const std::string& name, MeshCollection* collection);
 
-	double E_q(Eigen::VectorXd q);
+	double E_q(Eigen::VectorXd x);
+
+	Eigen::Matrix3d rodrigues(Eigen::Vector3d);
 
 	int step(double time);
 	int init(double time)
@@ -45,7 +47,15 @@ protected:
 	Eigen::MatrixXd qt;
 	Eigen::MatrixXd qprev;
 	Eigen::MatrixXd qdot;
+
+	Eigen::MatrixXd Qt;
+	Eigen::MatrixXd Qprev;
+	Eigen::MatrixXd Qdot;
+
 	Eigen::MatrixXd fe;
+
+	Eigen::Vector3d I;
+	Eigen::Matrix3d J;
 
 	MeshCollection* collection;
 };

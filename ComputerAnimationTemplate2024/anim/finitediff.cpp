@@ -84,13 +84,13 @@ namespace fd {
         for (size_t i = 0; i < x.rows(); i++) {
             for (size_t ci = 0; ci < inner_steps; ci++) {
                 x_mutable[i] += internal_coeffs[ci] * eps;
-                //animTcl::OutputMessage("[%f %f %f %f %f %f]: %f", x_mutable(0), x_mutable(1), x_mutable(2), x_mutable(3), x_mutable(4), x_mutable(5), f(x_mutable));
+                // animTcl::OutputMessage("f(x): %f", f(x_mutable));
                 grad[i] += external_coeffs[ci] * f(x_mutable);
                 x_mutable[i] = x[i];
             }
             grad[i] /= denom;
         }
-        //animTcl::OutputMessage("[%f %f %f %f %f %f]", grad(0), grad(1), grad(2), grad(3), grad(4), grad(5));
+        // animTcl::OutputMessage("[%f %f %f %f %f %f]", grad(0), grad(1), grad(2), grad(3), grad(4), grad(5));
     }
 
     void finite_jacobian(

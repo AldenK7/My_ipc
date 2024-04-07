@@ -293,8 +293,16 @@ double b(double d, double dhat) {
 }
 
 
-double Mesh::barrierWithMesh(Mesh* mesh) {
+double Mesh::barrierWithMesh(Mesh* mesh, Vector3d trans, Vector3d rot) {
 	double barrier = 0.0;
+
+	double t[3] = { trans[0], trans[1], trans[2] };
+	setTranslation(t);
+
+	double r[3] = { rot[0], rot[1], rot[2] };
+	setRotation(r);
+
+
 
 	/* Points ------------------------------------------------------- */
 	for (int v = 0; v < num_vertices; v++) {
@@ -310,7 +318,7 @@ double Mesh::barrierWithMesh(Mesh* mesh) {
 				
 				double dist = sub.norm();
 				if (dist == 0.0) 
-					dist = 1.0e-10;
+					dist = 1.0e-100;
 
 				barrier += b(sub.norm(), dhat);
 			}
@@ -326,7 +334,7 @@ double Mesh::barrierWithMesh(Mesh* mesh) {
 
 				double dist = abs(sub.dot(cross / cross.norm()));
 				if (dist == 0.0)
-					dist = 1.0e-10;
+					dist = 1.0e-100;
 
 				barrier += b(dist, dhat);
 			}
@@ -334,51 +342,86 @@ double Mesh::barrierWithMesh(Mesh* mesh) {
 	}
 
 	/* Triangles ----------------------------------------------------- */
-	for (int t = 0; t < num_triangles; t++) {
-		aabb::AABB box = bvhTree.getAABB(t + num_vertices);
-		std::vector<unsigned int> contacts = mesh->bvhTree.query(box);
+	//for (int t = 0; t < num_triangles; t++) {
+	//	aabb::AABB box = bvhTree.getAABB(t + num_vertices);
+	//	std::vector<unsigned int> contacts = mesh->bvhTree.query(box);
 
-		for (int col = 0; col < contacts.size(); col++) {
-			int ind = contacts[col];
+	//	for (int col = 0; col < contacts.size(); col++) {
+	//		int ind = contacts[col];
 
-			// Triangle Point
-			if (ind < num_triangles) {
-				Vector3d sub = mesh->vertices[ind] - triangles[t].p1;
-				Vector3d cross =
-					(triangles[t].p2 - mesh->vertices[ind]).cross(triangles[t].p3 - mesh->vertices[ind]);
+	//		// Triangle Point
+	//		if (ind < mesh->num_triangles) {
+	//			Vector3d sub = mesh->vertices[ind] - triangles[t].p1;
+	//			Vector3d cross =
+	//				(triangles[t].p2 - mesh->vertices[ind]).cross(triangles[t].p3 - mesh->vertices[ind]);
 
-				double dist = abs(sub.dot(cross / cross.norm()));
-				if (dist == 0.0)
-					dist = 1.0e-10;
+	//			double dist = abs(sub.dot(cross / cross.norm()));
+	//			if (dist == 0.0)
+	//				dist = 1.0e-10;
 
-				barrier += b(dist, dhat);
-			}
-		}
-	}
+	//			barrier += b(dist, dhat);
+	//		}
+	//	}
+	//}
 
 	return barrier;
 }
 
 void Mesh::setTranslation(double* p) {
-	m_pos[0] = p[0];
-	m_pos[1] = p[1];
-	m_pos[2] = p[2];
+	m_pos(0) = p[0];
+	m_pos(1) = p[1];
+	m_pos(2) = p[2];
 
 	for (int v = 0; v < num_vertices; v++) {
 		vertices[v] = init_vertices[v] + m_pos;
 	}
 
 	for (int t = 0; t < num_triangles; t++) {
-		triangles[t].p1 = init_triangles->p1 + m_pos;
-		triangles[t].p2 = init_triangles->p2 + m_pos;
-		triangles[t].p3 = init_triangles->p3 + m_pos;
+		triangles[t].p1 = init_triangles[t].p1 + m_pos;
+		triangles[t].p2 = init_triangles[t].p2 + m_pos;
+		triangles[t].p3 = init_triangles[t].p3 + m_pos;
 	}
 
 	updateBVH();
 }
 
 void Mesh::setRotation(double* p) {
-	// VecCopy(m_rot, p);
+	m_rot(0) = p[0];
+	m_rot(1) = p[1];
+	m_rot(2) = p[2];
+
+	double theta = m_rot.norm() * PI / 180;
+
+	if (theta == 0.0)
+		return;
+
+	Vector3d e = m_rot / theta;
+
+	for (int v = 0; v < num_vertices; v++) {
+		vertices[v] = 
+			(init_vertices[v] * cos(theta)) + 
+			(e.cross(init_vertices[v])) + 
+			((1-cos(theta)) * e.dot(init_vertices[v]) * e);
+	}
+
+	for (int t = 0; t < num_triangles; t++) {
+		triangles[t].p1 = 
+			(init_triangles[t].p1 * cos(theta)) +
+			(e.cross(init_triangles[t].p1)) +
+			((1 - cos(theta)) * e.dot(init_triangles[t].p1) * e);
+
+		triangles[t].p2 = 
+			(init_triangles[t].p2 * cos(theta)) +
+			(e.cross(init_triangles[t].p2)) +
+			((1 - cos(theta)) * e.dot(init_triangles[t].p2) * e);
+
+		triangles[t].p3 = 
+			(init_triangles[t].p3 * cos(theta)) +
+			(e.cross(init_triangles[t].p3)) +
+			((1 - cos(theta)) * e.dot(init_triangles[t].p3) * e);
+	}
+
+	updateBVH();
 }
 
 void Mesh::getTranslation(double* p) {
@@ -388,7 +431,9 @@ void Mesh::getTranslation(double* p) {
 }
 
 void Mesh::getRotation(double* p) {
-	// VecCopy(p, m_rot);
+	p[0] = m_rot[0];
+	p[1] = m_rot[1];
+	p[2] = m_rot[2];
 }
 
 
@@ -399,6 +444,7 @@ void Mesh::display(GLenum mode)
 	glPushMatrix();
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	glTranslated(m_pos[0], m_pos[1], m_pos[2]);
+	glRotated(m_rot.norm(), m_rot[0], m_rot[1], m_rot[2]);
 	glScalef(m_sx, m_sy, m_sz);
 
 	glmDraw(&m_model, GLM_SMOOTH | GLM_MATERIAL);

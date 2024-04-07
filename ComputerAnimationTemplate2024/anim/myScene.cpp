@@ -96,9 +96,14 @@ void MakeScene(void)
 	cube1->setupPrimitives();
 
 	Vector pos1;
-	setVector(pos1, 1.0, 2.5, 0.0);
+	setVector(pos1, 0.0, 3.0, 0.0);
+
+	Vector rot1;
+	setVector(rot1, 0.0, 0.0, 0.0);
+
 	cube1->createBVH();
 	cube1->setTranslation(pos1);
+	cube1->setRotation(rot1);
 
 	Mesh* cube2 = new Mesh("cube2", 2.0, "data/cube.obj");
 	success = GlobalResourceManager::use()->addSystem(cube2, true);
