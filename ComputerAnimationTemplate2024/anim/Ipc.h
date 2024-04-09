@@ -10,18 +10,28 @@
 #include "MeshCollection.h"
 #include "finitediff.h"
 #include "GlobalResourceManager.h"
-#include "Eigen/Core"
+#include "Eigen/Dense"
 
+#include <iostream>
+#include <fstream>
 #include <string>
-
+#include <vector>
+#include <cstdio>
 
 class Ipc : public BaseSimulator
 {
 public:
 
 	Ipc(const std::string& name, MeshCollection* collection);
+	Ipc(const std::string& name, MeshCollection* collection, std::string file);
 
-	double E_q(Eigen::VectorXd q);
+	double E_q(Eigen::VectorXd x);
+
+	Eigen::VectorXd vecCopy(Eigen::VectorXd v1);
+	Eigen::MatrixXd matCopy(Eigen::MatrixXd m1);
+	double norm(Eigen::VectorXd v);
+	Eigen::VectorXd flatten(Eigen::MatrixXd m);
+	Eigen::MatrixXd unflatten(Eigen::VectorXd m);
 
 	int step(double time);
 	int init(double time)
@@ -48,6 +58,12 @@ protected:
 	Eigen::MatrixXd fe;
 
 	MeshCollection* collection;
+
+	bool use_file;
+	std::string file;
+	Eigen::Vector3d* coords;
+	int line;
+	int line_nums;
 };
 
 

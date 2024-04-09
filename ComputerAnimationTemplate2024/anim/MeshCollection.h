@@ -19,7 +19,13 @@ public:
 
 	void addMesh(Mesh* newMesh);
 
-	double getBarrier();
+	double getBarrier(Eigen::Vector3d trans);
+
+	double getDistance(Eigen::Vector3d trans);
+
+	double CCD();
+
+	Eigen::MatrixXd getTranslations();
 
 protected:
 	int maxSize;
@@ -27,5 +33,8 @@ protected:
 	
 	Mesh** meshes;
 
+	double barrier;
+
+	double dhat = 0.5;
 };
 #endif

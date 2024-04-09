@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string>
 
 #include <shared/defs.h>
 
@@ -89,35 +90,137 @@ void MakeScene(void)
 
 	bool success;
 
-	Mesh* cube1 = new Mesh("cube1", 2.0, "data/cube.obj");
-	success = GlobalResourceManager::use()->addSystem(cube1, true);
-	assert(success);
+	int scene = 0;
 
-	cube1->setupPrimitives();
+	MeshCollection* collection;
+	Mesh* obj1;
+	Mesh* obj2;
 
 	Vector pos1;
-	setVector(pos1, 1.0, 2.5, 0.0);
-	cube1->createBVH();
-	cube1->setTranslation(pos1);
-
-	Mesh* cube2 = new Mesh("cube2", 2.0, "data/cube.obj");
-	success = GlobalResourceManager::use()->addSystem(cube2, true);
-	assert(success);
-
 	Vector pos2;
-	setVector(pos2, 0.0, 0.0, 0.0);
-	cube2->createBVH();
-	cube2->setTranslation(pos2);
 
-	MeshCollection* collection = new MeshCollection(2);
-	collection->addMesh(cube1);
-	collection->addMesh(cube2);
+	switch (scene) {
+		case 0:
+			obj1 = new Mesh("1", 1.0, "data/cube.obj", 0);
+			success = GlobalResourceManager::use()->addSystem(obj1, true);
+			assert(success);
 
-	Ipc* ipc = new Ipc("ipc", collection);
+			obj1->setupPrimitives();
+
+			pos1;
+			setVector(pos1, 0.0, 2.0, 0.0);
+
+			obj1->createBVH();
+			obj1->setTranslation(pos1);
+
+			obj2 = new Mesh("2", 1.0, "data/floor.obj", 1);
+			success = GlobalResourceManager::use()->addSystem(obj2, true);
+			assert(success);
+
+			pos2;
+			setVector(pos2, 0.0, -0.9, 0.0);
+
+			obj2->createBVH();
+			obj2->setTranslation(pos2);
+
+			collection = new MeshCollection(2);
+			collection->addMesh(obj1);
+			collection->addMesh(obj2);
+
+			break;
+
+		case 1:
+			obj1 = new Mesh("1", 1.0, "data/cone.obj", 0);
+			success = GlobalResourceManager::use()->addSystem(obj1, true);
+			assert(success);
+
+			obj1->setupPrimitives();
+
+			pos1;
+			setVector(pos1, 0.0, 2.0, 0.0);
+
+			obj1->createBVH();
+			obj1->setTranslation(pos1);
+
+			obj2 = new Mesh("2", 1.0, "data/torus_small.obj", 1);
+			success = GlobalResourceManager::use()->addSystem(obj2, true);
+			assert(success);
+
+			pos2;
+			setVector(pos2, 0.0, -0.9, 0.0);
+
+			obj2->createBVH();
+			obj2->setTranslation(pos2);
+
+			collection = new MeshCollection(2);
+			collection->addMesh(obj1);
+			collection->addMesh(obj2);
+
+			break;
+
+		case 2:
+			obj1 = new Mesh("1", 1.0, "data/cone.obj", 0);
+			success = GlobalResourceManager::use()->addSystem(obj1, true);
+			assert(success);
+
+			obj1->setupPrimitives();
+
+			pos1;
+			setVector(pos1, 0.0, 1.0, 0.0);
+
+			obj1->createBVH();
+			obj1->setTranslation(pos1);
+
+			obj2 = new Mesh("2", 1.0, "data/floor.obj", 1);
+			success = GlobalResourceManager::use()->addSystem(obj2, true);
+			assert(success);
+
+			pos2;
+			setVector(pos2, 0.0, -0.9, 0.0);
+
+			obj2->createBVH();
+			obj2->setTranslation(pos2);
+
+			collection = new MeshCollection(2);
+			collection->addMesh(obj1);
+			collection->addMesh(obj2);
+
+			break;
+
+		case 3:
+			obj1 = new Mesh("1", 1.0, "data/cube.obj", 0);
+			success = GlobalResourceManager::use()->addSystem(obj1, true);
+			assert(success);
+
+			obj1->setupPrimitives();
+
+			pos1;
+			setVector(pos1, 0.0, 1.0, 0.0);
+
+			obj1->createBVH();
+			obj1->setTranslation(pos1);
+
+			obj2 = new Mesh("2", 1.0, "data/torus.obj", 1);
+			success = GlobalResourceManager::use()->addSystem(obj2, true);
+			assert(success);
+
+			pos2;
+			setVector(pos2, 0.0, -0.9, 0.0);
+
+			obj2->createBVH();
+			obj2->setTranslation(pos2);
+
+			collection = new MeshCollection(2);
+			collection->addMesh(obj1);
+			collection->addMesh(obj2);
+
+			break;
+	}
+
+	// Ipc* ipc = new Ipc("ipc", collection);
+	Ipc* ipc = new Ipc("ipc", collection, "../sim.txt");
 	success = GlobalResourceManager::use()->addSimulator(ipc);
 	assert( success );
-
-
 
 }	// MakeScene
 

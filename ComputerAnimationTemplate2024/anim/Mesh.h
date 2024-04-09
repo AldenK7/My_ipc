@@ -23,7 +23,7 @@ class Mesh : public BaseSystem
 {
 
 public:
-	Mesh(const std::string& name, float size, char* mesh);
+	Mesh(const std::string& name, float size, char* mesh, int id);
 	virtual void getState(double* p);
 	virtual void setState(double* p);
 	void reset(double time);
@@ -35,7 +35,9 @@ public:
 
 	void createBVH();
 	void updateBVH();
-	double barrierWithMesh(Mesh* mesh);
+
+	double barrierWithMesh(Mesh* mesh, Eigen::Vector3d trans);
+	double minDistance(Mesh* mesh, Eigen::Vector3d trans);
 
 	void setTranslation(double* p);
 	void setRotation(double* p);
@@ -60,6 +62,11 @@ public:
 	Triangle* init_triangles;
 	int num_triangles;
 
+	Eigen::Vector3d m_pos;
+	Eigen::Vector3d m_rot;
+
+	int id;
+
 protected:
 
 	float m_sx;
@@ -68,10 +75,6 @@ protected:
 
 	float size;
 
-	Eigen::Vector3d m_pos;
-	Eigen::Vector3d m_rot;
-
-	double dhat = 0.1;
-	
+	double dhat = 0.05;
 };
 #endif
